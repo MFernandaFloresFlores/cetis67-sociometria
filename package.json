@@ -1,0 +1,13 @@
+{
+  "name": "cetis67-plataforma",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma Integral de Sociometría y Salud Emocional CETIS 67",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed",
+    "dev": "npm --prefix server run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start"
+  }
+}

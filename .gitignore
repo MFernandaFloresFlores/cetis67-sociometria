@@ -1,0 +1,24 @@
+# Dependencias
+node_modules/
+
+# Build del frontend (se genera con "npm run build")
+client/dist/
+
+# Variables de entorno y secretos — NUNCA subir esto
+.env
+.env.local
+*.env
+
+# Base de datos (contiene datos reales de alumnos)
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/
