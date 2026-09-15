@@ -21,18 +21,32 @@ salud emocional, relaciones personales, integración/segregación, alertas, info
 
 - Node.js **22 o superior** (usa el módulo `node:sqlite` integrado).
 
-## Instalación y arranque
+## Instalación en una PC nueva (uso real, recomendado)
+
+Doble clic en **`instalar.bat`** (Windows). Instala todo, genera `server/.env` con la IP de
+red correcta, compila, deja el servidor corriendo con `pm2`, y **al final te pide escribir
+tú mismo el nombre y la contraseña** de la cuenta `admin` — esa es la contraseña real que hay
+que usar para entrar, **no** `admin123` (esa solo existe en el modo de pruebas de abajo).
+Si se te olvidó qué contraseña pusiste, ver la sección **"¿Se te olvidó la contraseña de
+admin?"** más abajo para restablecerla.
+
+Después de esa primera vez, `iniciar-servidor.bat` sirve para arrancar/verificar el servidor.
+
+## Instalación para desarrollo o pruebas (datos de ejemplo, NO producción)
 
 ```bash
 npm run install:all   # instala server y client
-npm run seed          # crea usuarios, grupo demo con 24 alumnos y una aplicación con respuestas
+npm run seed          # crea usuarios y datos de ejemplo (ver tabla abajo) — NO usar en un plantel real
 npm run build         # compila el frontend (client/dist)
 npm start             # sirve API + frontend en http://localhost:3000
 ```
 
 Para desarrollo con recarga: `npm run dev` (servidor) y `npm --prefix client run dev` (Vite en :5173 con proxy a la API).
 
-## Usuarios de demostración
+### Usuarios de ejemplo (solo si usaste `npm run seed`)
+
+Estas cuentas **no existen** en una instalación real hecha con `instalar.bat` — ahí la
+contraseña de `admin` es la que se escribió durante la instalación.
 
 | Usuario | Contraseña | Rol |
 |---|---|---|
@@ -44,6 +58,11 @@ Para desarrollo con recarga: `npm run dev` (servidor) y `npm --prefix client run
 La semilla imprime el enlace público de la aplicación demo (`/r/<token>`), también visible
 en **Formularios y QR → Ver QR**. Dos matrículas sin responder para probar el flujo del
 alumno: `26670122` y `26670123` (si ya se usaron, crea una aplicación nueva).
+
+## ¿Se te olvidó la contraseña de admin?
+
+No hay recuperación por correo. Se restablece por línea de comandos, sin perder ningún dato —
+ver **"Gestión de usuarios de personal"** más abajo.
 
 ## Variables de entorno (`.env` o entorno del proceso)
 
@@ -84,13 +103,20 @@ client/src/
 - Profesores solo ven grupos asignados; auditor solo lee bitácora; toda consulta sensible
   (perfiles, salud emocional, exportaciones) queda en `audit_logs`.
 
-## Despliegue en producción (resumen)
+## Despliegue en producción
 
-1. Servidor con Node 22+, HTTPS obligatorio (proxy inverso Nginx/Caddy).
-2. Define `JWT_SECRET` fuerte, `NODE_ENV=production`, `PUBLIC_URL` y `DATA_DIR` en disco persistente.
-3. `npm run install:all && npm run build && npm start` (usa `systemd` o `pm2` para mantenerlo vivo).
-4. Respaldos: copia periódica del archivo `DATA_DIR/cetis67.db` (SQLite en modo WAL).
-5. Borra la base semilla y crea usuarios reales con contraseñas propias antes de operar.
+- **En una PC de la escuela (Windows), red local**: usa `instalar.bat` (ver arriba). Es el
+  caso cubierto y probado en este proyecto — ver "Estado actual de esta instalación" abajo.
+- **En un servidor remoto con dominio propio (Linux/VPS)**, para que funcione fuera de la
+  red local:
+  1. Node 22+, HTTPS obligatorio (proxy inverso Nginx/Caddy).
+  2. Define `JWT_SECRET` fuerte, `NODE_ENV=production`, `PUBLIC_URL` (con `https://`) y
+     `DATA_DIR` en disco persistente — en `server/.env`.
+  3. `npm run install:all && npm run build && npm start` (usa `pm2` o `systemd` para
+     mantenerlo vivo).
+  4. Respaldos: copia periódica del archivo `DATA_DIR/cetis67.db` (SQLite en modo WAL).
+  5. Crea la cuenta admin real (ver "Gestión de usuarios de personal") — nunca uses `npm run
+     seed` en un servidor con alumnos reales.
 
 ## Gestión de usuarios de personal
 
@@ -103,7 +129,8 @@ npm run create-user -- <usuario> "<Nombre completo>" <admin|teacher|counselor|au
 ```
 
 Si el usuario ya existe, el mismo comando actualiza su nombre/rol/contraseña (sirve también
-para cambiar contraseñas, ya que tampoco hay recuperación por correo).
+para cambiar contraseñas, ya que tampoco hay recuperación por correo). Después de cambiar
+una contraseña con el servidor ya corriendo, reinícialo para que tome efecto: `pm2 restart cetis67`.
 
 ## Estado actual de esta instalación
 
